@@ -46,21 +46,25 @@ def getProductById(categoryId, productId):
 
 
 def createProduct(categoryId,jsonData):
-	productName = jsonData['productName']
-	quantity = jsonData['quantity']
-	userId = jsonData['userId']
-	expectedOffer = jsonData['expectedOffer']
-	productDesc = jsonData['productDesc']
-	productExpiryDate = jsonData['productExpiryDate']
-	isValid = jsonData['isValid']
-	categoryId = jsonData['categoryId']
-	lastUpdated = jsonData['lastUpdated']
-	cursor=DBConnectionPool.dbconnect()
 	try:
-		cursor.execute("INSERT into product(productName,quantity,userId,expectedOffer,productDesc,productExpiryDate,isValid,categoryId,lastUpdated) VALUES (?,?,?,?,?,?,?,?,?)",(product.productName,product.quantity,product.userId,product.expectedOffer,product.productDesc,product.productExpiryDate,product.isValid,product.categoryId,product.lastUpdated))
+		productName = jsonData['productName']
+		quantity = jsonData['quantity']
+		userId = jsonData['userId']
+		expectedOffer = jsonData['expectedOffer']
+		productDesc = jsonData['productDesc']
+		productExpiryDate = jsonData['productExpiryDate']
+		isValid = jsonData['isValid']
+		categoryId = jsonData['categoryId']
+		lastUpdated = jsonData['lastUpdated']
+
+		cursor=DBConnectionPool.dbconnect()
+		prodSql = """Insert into Product (productName,quantity,userId,expectedOffer,productDesc,productExpiryDate,isValid,categoryId,lastUpdated) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s)"""
+		cursor.execute(prodSql, (productName,quantity,userId,expectedOffer,productDesc,productExpiryDate,isValid,categoryId,lastUpdated))
+		
 		cursor.connection.commit()
 		product_id = cursor.connection.insert_id()
 		cursor.close()
+		
 		return getProductById(categoryId,product_id)
 	except:
 		errorResponse = cust_error(500,"Something went wrong in processing at server side")
@@ -195,35 +199,33 @@ def getOfferByProductId(categoryId, productId):
 def getAllProductsByCategoryId(categoryId):
 	try:
 		cursor = DBConnectionPool.dbconnect()
-		cursor.execute('SELECT * from Product where categoryId=%s',categoryId)
+		cursor.execute('SELECT * from Product where categoryId=%s',(categoryId))
 		productData = cursor.fetchall()
 		
-		if not offerData:
-		
+		if not productData:
 			errString = "No Products for this categoryId " + categoryId + "!!!"
 			errorResponse = cust_error(404,errString)
 			return errorResponse
 		else:	
 			productDict = dict()
-			ProductList = []
+			productList = []
 			for data in productData:
 				jdict = dict()
 				jdict['productId'] = data[0]
-				jdict['productName'] = data[1]
+				jdict['productName'] = str(data[1])
 				jdict['quantity'] = data[2]
 				jdict['userId'] = data[3]
-				jdict['expectedOffer'] = data[4]
+				jdict['expectedOffer'] = str(data[4])
 				jdict['productDesc'] = str(data[5])
-				jdict['productExpiryDate'] = data[6]
+				jdict['productExpiryDate'] = str(data[6])
 				jdict['isValid'] = data[7]
-				jdict['categoryId'] = str(data[8])
+				jdict['categoryId'] = data[8]
 				jdict['lastUpdated'] = str(data[9])
-				ProductList.append(jdict)
+				productList.append(jdict)
 				
 			productDict['products'] = productList		
-			dbResponse=json.dumps(offerDict,indent = 4)
-			return dbResponse			
-				
+			dbResponse=json.dumps(productDict,indent = 4)
+			return dbResponse						
 	except:
 		errorResponse = cust_error(500,"Something went wrong while processing at server side")
 		cursor.close()
