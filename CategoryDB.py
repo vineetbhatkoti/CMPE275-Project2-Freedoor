@@ -57,7 +57,8 @@ def getCategoryById(categoryId):
 def createCategoryByName(categoryName):
 	try:
 		cursor=DBConnectionPool.dbconnect()
-		cursor.execute("insert into Category (categoryName) values(%s)",categoryName)	
+		cursor.execute("insert into Category (categoryName) values(%s)",categoryName)
+		cursor.connection.commit()
 		cursor.execute("Select * from Category where categoryName=%s",categoryName)
 		row = cursor.fetchone()
 		if row is not None:
