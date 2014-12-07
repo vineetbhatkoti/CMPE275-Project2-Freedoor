@@ -3,6 +3,7 @@ import UserDB
 import CommentDB
 import ProductDB
 import OfferDB
+import CategoryDB
 
 from bottle import route, run, template, request, response, get , post, error
 
