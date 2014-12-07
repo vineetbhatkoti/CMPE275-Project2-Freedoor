@@ -74,4 +74,20 @@ def createCommentByOfferId(categoryId,productId,offerId):
 	retData = CommentDB.createCommentByOfferId(categoryId,productId,offerId,jsonData)
 	return retData
 
+
+# ********************* Offer *************************************
+@route('/category/<categoryId>/product/<productId>/offer', method='POST')
+def createOffer(categoryId,productId):
+        postData = request.body.read()
+        jsonData = json.loads(postData)
+        
+        retData1 = ProductDB.createOfferByProductId(categoryId,productId,jsonData)
+        return str(retData1)
+
+@route('/category/<categoryId>/product/<productId>/offer', method='GET')
+def getOffer(categoryId,productId):
+        retData1 = ProductDB.getOfferByProductId(categoryId,productId)
+        print(retData1)
+        return str(retData1)
+
 run(host='localhost', port=8090)
