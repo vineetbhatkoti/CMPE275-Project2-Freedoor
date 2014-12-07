@@ -94,7 +94,7 @@ def deleteOffer(categoryId,productId,offerId):
 	status = OfferDB.deleteOffer(offerId)
 	return status
 	
-@route('/category/<categoryId>/product/<productId>/offer/<offerId>', methos='PUT')
+@route('/category/<categoryId>/product/<productId>/offer/<offerId>', method='PUT')
 def updateOffer(categoryId,productId,offerId):
 	postData = request.body.read()
 	jsonData = json.loads(postdata)
