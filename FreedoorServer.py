@@ -2,6 +2,7 @@ import json
 import UserDB
 import CommentDB
 import ProductDB
+import OfferDB
 
 from bottle import route, run, template, request, response, get , post, error
 
@@ -52,10 +53,10 @@ def getProductById(categoryId,productId):
 	return retData
 
 @route('/category/:categoryId/product', method='POST')
-def createProduct():
-	postData = request.bdy.read()
-	jsonData = json.loads(postdata)
-	retData = ProductDb.createProduct(categoryId,jsonData)
+def createProduct(categoryId):
+	postData = request.body.read()
+	jsonData = json.loads(postData)
+	retData = ProductDB.createProduct(categoryId,jsonData)
 	return retData
         
 @route('/category/<categoryId>/product/<productId>', method='PUT')
@@ -73,5 +74,21 @@ def createCommentByOfferId(categoryId,productId,offerId):
 	jsonData = json.loads(postData)
 	retData = CommentDB.createCommentByOfferId(categoryId,productId,offerId,jsonData)
 	return retData
+	
+@route('/category/:categoryId/product/:productId/offer/:offerId', method='DELETE')
+def deleteOffer(offerId):
+	status = OfferDB.deleteOffer(offerid)
+	return status
+	
+@route('/category/:categoryId/product/:productId/offer/:offerId', methos='PUT')
+def updateOffer():
+	postData = request.body.read()
+	jsonData = json.loads(postdata)
+	retData = OfferDB.updateOffer(jsonData)
+	return retData
 
+@route('/category/:categoryId/product/:productId/offer/:offerId', method='GET')
+def retrieveOffer(offerId):
+	retData = OfferDB.retrieveOffer(offerId)
+	return retData
 run(host='localhost', port=8090)

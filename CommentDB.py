@@ -15,12 +15,12 @@ def cust_error(statuscode,message):
 
 def createCommentByOfferId(categoryId,productId,offerId,jsonData):
 	comment=jsonData['comment']
- 	userId=jsonData['userId']
- 	cursor=DBConnectionPool.dbconnect()
- 	now=datetime.now()
- 	time = now.strftime('%Y-%m-%d %H:%M:%S')
- 	
- 	try:
+	userId=jsonData['userId']
+	cursor=DBConnectionPool.dbconnect()
+	now=datetime.now()
+	time = now.strftime('%Y-%m-%d %H:%M:%S')
+	
+	try:
  		commentInserted="""INSERT INTO Comment (commentDesc,lastUpdated,offerId,userId) VALUES (%s,%s,%s,%s)"""
  		cursor.execute(commentInserted, (comment,time,offerId,userId))
  		cursor.connection.commit()
@@ -42,7 +42,7 @@ def createCommentByOfferId(categoryId,productId,offerId,jsonData):
  			cursor.close()
  			errorResponse = cust_error(404,"Comment could not be created successfully")
  			return errorResponse
- 	except:
+	except:
  		errorResponse = cust_error(500,"Comment could not be created due to some exception")
  		cursor.close()
  		return errorResponse
