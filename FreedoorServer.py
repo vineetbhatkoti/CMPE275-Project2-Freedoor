@@ -42,7 +42,7 @@ def createCategoryByName():
 
 # **************** Product ****************************
 
-@route('/category/:categoryId/product', method='GET')
+@route('/category/<categoryId>/product', method='GET')
 def getAllProductsByCategoryId(categoryId):
 	retData = ProductDB.getAllProductsByCategoryId(categoryId)
 	return retData
@@ -52,7 +52,7 @@ def getProductById(categoryId,productId):
 	retData = ProductDB.getProductById(categoryId,productId)
 	return retData
 
-@route('/category/:categoryId/product', method='POST')
+@route('/category/<categoryId>/product', method='POST')
 def createProduct(categoryId):
 	postData = request.body.read()
 	jsonData = json.loads(postData)
@@ -91,20 +91,20 @@ def getOffer(categoryId,productId):
         print(retData1)
         return str(retData1)
 
-@route('/category/:categoryId/product/:productId/offer/:offerId', method='DELETE')
-def deleteOffer(offerId):
-	status = OfferDB.deleteOffer(offerid)
+@route('/category/<categoryId>/product/<productId>/offer/<offerId>', method='DELETE')
+def deleteOffer(categoryId,productId,offerId):
+	status = OfferDB.deleteOffer(offerId)
 	return status
 	
-@route('/category/:categoryId/product/:productId/offer/:offerId', methos='PUT')
-def updateOffer():
+@route('/category/<categoryId>/product/<productId>/offer/<offerId>', methos='PUT')
+def updateOffer(categoryId,productId,offerId):
 	postData = request.body.read()
 	jsonData = json.loads(postdata)
 	retData = OfferDB.updateOffer(jsonData)
 	return retData
 
-@route('/category/:categoryId/product/:productId/offer/:offerId', method='GET')
-def retrieveOffer(offerId):
+@route('/category/<categoryId>/product/<productId>/offer/<offerId>', method='GET')
+def retrieveOffer(categoryId,productId,offerId):
 	retData = OfferDB.retrieveOffer(offerId)
 	return retData
 run(host='localhost', port=8090)
