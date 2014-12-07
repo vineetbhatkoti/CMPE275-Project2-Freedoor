@@ -187,6 +187,44 @@ def getOfferByProductId(categoryId, productId):
 	except:
 		db.rollback()
 		errorResponse = cust_error(500,"Something went wrong while processing at server side")
+		cursor.close()
 		return errorResponse
 	
+		
+		
+def getAllProductsByCategoryId(categoryId):
+	try:
+		cursor = DBConnectionPool.dbconnect()
+		cursor.execute('SELECT * from Product where categoryId=%s',categoryId)
+		productData = cursor.fetchall()
+		
+		if not offerData:
+		
+			errString = "No Products for this categoryId " + categoryId + "!!!"
+			errorResponse = cust_error(404,errString)
+			return errorResponse
+		else:	
+			productDict = dict()
+			ProductList = []
+			for data in productData:
+				jdict = dict()
+				jdict['productId'] = data[0]
+				jdict['productName'] = data[1]
+				jdict['quantity'] = data[2]
+				jdict['userId'] = data[3]
+				jdict['expectedOffer'] = data[4]
+				jdict['productDesc'] = str(data[5])
+				jdict['productExpiryDate'] = data[6]
+				jdict['isValid'] = data[7]
+				jdict['categoryId'] = str(data[8])
+				jdict['lastUpdated'] = str(data[9])
+				ProductList.append(jdict)
+				
+			productDict['products'] = productList		
+			dbResponse=json.dumps(offerDict,indent = 4)
+			return dbResponse			
+				
+	except:
+		errorResponse = cust_error(500,"Something went wrong while processing at server side")
 		cursor.close()
+		return errorResponse

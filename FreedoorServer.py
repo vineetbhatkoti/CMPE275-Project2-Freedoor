@@ -42,7 +42,7 @@ def createCategoryByName():
 
 # **************** Product ****************************
 
-@route('/category/<categoryId>/product', method='GET')
+@route('/category/:categoryId/product', method='GET')
 def getAllProductsByCategoryId(categoryId):
 	retData = ProductDB.getAllProductsByCategoryId(categoryId)
 	return retData
