@@ -23,7 +23,7 @@ def deleteOffer(offerId):
 		return response
 	except:
 		cursor.close()
-		errorResponse = cust_error(500,"Something went wrong in deleting Offer at server side")
+		errorResponse = cust_error(500,"Offer could not be deleted due to some exception.")
 		return errorResponse
 	
 def updateOffer(jsonData):
@@ -44,7 +44,7 @@ def updateOffer(jsonData):
 		cursor.close()       
 	except:
 		cursor.close()
-		errorResponse = cust_error(500,"Something went wrong in updating Offer at server side")
+		errorResponse = cust_error(500,"Offer could not be updated successfully due to some exception.")
 		return errorResponse
 	
 def retrieveOffer(offerId):
@@ -69,9 +69,13 @@ def retrieveOffer(offerId):
 			response.headers['Content-Type'] = 'application/json'
 			response.status=200
 			dbResponse = json.dumps(d, indent = 4)
+			cursor.close()
 			return dbResponse
-		cursor.close()
+		else:
+			errorResponse = cust_error(404,"Offer not found. Please check your offerid.")
+			cursor.close()
+			return errorResponse
 	except:
 		cursor.close()
-		errorResponse = cust_error(500,"Something went wrong in updating Offer at server side")
+		errorResponse = cust_error(500,"Offer could not be retrieved successfully due to som eexception.")
 		return errorResponse
