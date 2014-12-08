@@ -3,19 +3,20 @@ import json
 import DBConnectionPool
 
 from datetime import datetime
+from Constants import Constants
 
 def cust_error(statuscode,message):
 	error = dict()
-	error['status'] = statuscode
-	error['message'] = message
+	error[Constants.STATUS] = statuscode
+	error[Constants.MESSAGE] = message
 	errorResponse = json.dumps(error, indent = 4)
 	response.status =statuscode
-	response.headers['Content-Type'] = 'application/json'
+	response.headers[Constants.CONTENT] = Constants.CONTENT_TYPE
 	return errorResponse
 
 def createCommentByOfferId(categoryId,productId,offerId,jsonData):
-	comment=jsonData['comment']
-	userId=jsonData['userId']
+	comment=jsonData[Constants.COMMENT]
+	userId=jsonData[Constants.USERID]
 	cursor=DBConnectionPool.dbconnect()
 	now=datetime.now()
 	time = now.strftime('%Y-%m-%d %H:%M:%S')
@@ -33,9 +34,9 @@ def createCommentByOfferId(categoryId,productId,offerId,jsonData):
  			result.append(dict(zip(columns,row)))
  			for data in result:
  				jdict = dict()
- 				jdict['commentId'] = data['commentId']
- 				jdict['comment'] = data['commentDesc']
- 				jdict['userId'] = data['userId']
+ 				jdict[Constants.COMMENTID] = data[Constants.COMMENTID]
+ 				jdict[Constants.COMMENT] = data[Constants.COMMENTDESC]
+ 				jdict[Constants.USERID] = data[Constants.USERID]
  			return json.dumps(jdict,indent = 4)
  			cursor.close()
  		else:

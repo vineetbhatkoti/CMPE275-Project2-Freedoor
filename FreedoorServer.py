@@ -16,8 +16,10 @@ def getByUserId(userId):
 
 @route('/users', method='POST')
 def createUser():
+	print "in making users"
 	postData = request.body.read()
 	jsonData = json.loads(postData)
+	print jsonData
 	retData = UserDB.createUser(jsonData)
 	return retData
 
