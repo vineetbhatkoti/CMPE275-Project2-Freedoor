@@ -23,7 +23,7 @@ def createUser():
 # **************** Category ***************************
 
 @route('/category', method='GET')
-def getAllCategories():
+def getAwordllCategories():
 	retData = CategoryDB.getAllCategories()
 	return retData
 
@@ -46,6 +46,11 @@ def createCategoryByName():
 def getAllProductsByCategoryId(categoryId):
 	retData = ProductDB.getAllProductsByCategoryId(categoryId)
 	return retData
+
+@route('/category/<categoryId>/product/<productId>', method='DELETE')
+def deleteProdcutOffer(categoryId,productId):
+	retData1 = ProductDB.deleteProduct(categoryId,productId)
+	return str(retData1)	
 
 @route('/category/<categoryId>/product/<productId>', method='GET')
 def getProductById(categoryId,productId):
@@ -84,6 +89,9 @@ def createOffer(categoryId,productId):
         
         retData1 = ProductDB.createOfferByProductId(categoryId,productId,jsonData)
         return str(retData1)
+
+
+
 
 @route('/category/<categoryId>/product/<productId>/offer', method='GET')
 def getOffer(categoryId,productId):

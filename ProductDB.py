@@ -14,6 +14,16 @@ def cust_error(statuscode,message):
 	response.headers['Content-Type'] = 'application/json'
 	return errorResponse
 
+def cust_success(statuscode,message):
+	success = dict();
+	success['status'] = statuscode
+	success['message'] = message
+	successResponse = json.dumps(success, indent = 4)
+	response.status =statuscode
+	response.headers['Content-Type'] = 'application/json'
+	print successResponse
+	return successResponse	
+
 def getProductById(categoryId, productId):
 	try:
 		cursor=DBConnectionPool.dbconnect()
@@ -227,4 +237,19 @@ def getAllProductsByCategoryId(categoryId):
 	except:
 		errorResponse = cust_error(500,"Something went wrong while processing at server side")
 		cursor.close()
+		return errorResponse
+
+
+def deleteProduct(categoryId,productId):
+	try:
+		cursor = DBConnectionPool.dbconnect()
+		print 'DELETE from Product where productId=%s and categoryId=%s ',productId,categoryId
+		cursor.execute('DELETE from Product where productId=%s and categoryId=%s',(productId,categoryId))
+		cursor.connection.commit()
+		cursor.close()
+		response=cust_success(200,"Successfully deleted the product !!")
+		return response
+	except:
+		cursor.close()
+		errorResponse = cust_error(500,"Something went wrong in deleting Product at server side")
 		return errorResponse
