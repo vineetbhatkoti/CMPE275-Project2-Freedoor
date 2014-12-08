@@ -15,21 +15,25 @@ def cust_error(statuscode,message):
 def getAllCategories():
 	try:
 		cursor = DBConnectionPool.dbconnect()
-		cursor.execute("Select categoryId, categoryName from Category")
-		row = cursor.fetchone()
-		if row is not None:
-			d = dict()
-			d['categoryId'] = row[0]
-			d['categoryName'] = row[1]
-			response = json.dumps(d, indent = 4)
-			cursor.close()
-			return response
-		else:
-			errorResponse = cust_error(404,"Category not found. Please create a new category.")
-			cursor.close()
+		cursor.execute("Select * from Category")
+		row = cursor.fetchall()
+		if not row:
+			errorResponse = cust_error(404,"Catgory not found. Please create a new category.")
 			return errorResponse
+		else:
+			categoryDict = dict()
+			categoryList = []
+			for data in row:
+				d = dict()
+				d['categoryId'] = data[0]
+				d['categoryName'] = data[1]
+				categoryList.append(d)
+			categoryDict['category'] = categoryList	
+			dbresponse = json.dumps(categoryDict, indent = 4)
+			cursor.close()
+			return dbresponse
 	except:
-		errorResponse = cust_error(500,"Something went wrong in processing at server side")
+		errorResponse = cust_error(500,"Category could not be found due to exception")
 		cursor.close()
 		return errorResponse
 
