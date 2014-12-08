@@ -23,7 +23,7 @@ def deleteOffer(offerId):
 		return response
 	except:
 		cursor.close()
-		errorResponse = cust_error(500,"Something went wrong in deleting Offer at server side")
+		errorResponse = cust_error(500,"Offer could not be deleted due to some exception.")
 		return errorResponse
 	
 def updateOffer(jsonData):
@@ -44,10 +44,10 @@ def updateOffer(jsonData):
 		cursor.close()       
 	except:
 		cursor.close()
-		errorResponse = cust_error(500,"Something went wrong in updating Offer at server side")
+		errorResponse = cust_error(500,"Offer could not be updated successfully due to some exception.")
 		return errorResponse
 	
-def retrieveOffer(offerId):
+def getOfferById(offerId):
 	try:
 		cursor=DBConnectionPool.dbconnect()
 		cursor.execute("SELECT * FROM Offer WHERE offerId=%s",(offerId))
@@ -69,9 +69,102 @@ def retrieveOffer(offerId):
 			response.headers['Content-Type'] = 'application/json'
 			response.status=200
 			dbResponse = json.dumps(d, indent = 4)
+			cursor.close()
 			return dbResponse
-		cursor.close()
+		else:
+			errorResponse = cust_error(404,"Offer not found. Please check your offerid.")
+			cursor.close()
+			return errorResponse
 	except:
 		cursor.close()
-		errorResponse = cust_error(500,"Something went wrong in updating Offer at server side")
+		errorResponse = cust_error(500,"Offer could not be retrieved successfully due to som eexception.")
+		return errorResponse
+
+def createOfferByProductId(categoryId, productId,jsonData):
+	try:
+		cursor = DBConnectionPool.dbconnect()
+		buyingQty = jsonData['buyingQty']
+		offeredDetails = jsonData['offeredDetails']
+		buyerStatus = jsonData['buyerStatus']
+		sellerStatus = jsonData['sellerStatus']
+		offerExpiry = jsonData['offerExpiry']
+		buyerId = jsonData['buyerId']
+		commentDesc = jsonData['comments']
+		now=datetime.now()
+		time = now.strftime('%Y-%m-%d %H:%M:%S')
+		
+		try:
+			sql = """Insert into Offer (buyingQty,offeredDetails,buyerStatus,sellerStatus,offerExpiry,productId,buyerId,lastModified) VALUES (%s,%s,%s,%s,%s,%s,%s,%s)"""
+			cursor.execute(sql, (buyingQty,offeredDetails,buyerStatus,sellerStatus,offerExpiry,productId,buyerId,time))
+			row = cursor.connection.commit()
+			offerId = cursor.connection.insert_id()
+			commentSql = """Insert into Comment (commentDesc,lastUpdated,offerId,userId) VALUES (%s,%s,%s,%s)"""
+			cursor.execute(commentSql, (commentDesc,time,offerId,buyerId))
+			row1 = cursor.connection.commit()
+			cursor.execute('SELECT * from Offer where offerId=%s',offerId)
+			data = cursor.fetchone()
+	
+			cursor.execute('SELECT * from Comment where offerId=%s',offerId)
+			commentData = cursor.fetchall()
+	
+			commList = []
+			if not data is None:
+				jdict = dict()
+				jdict['offerId'] = data[0]
+				jdict['buyingQty'] = data[1]
+				jdict['offeredDetails'] = data[2]
+				jdict['buyerStatus'] = data[3]
+				jdict['sellerStatus'] = data[4]
+				jdict['offerExpiry'] = str(data[5])
+				jdict['productId'] = data[6]
+				jdict['buyerId'] = data[7]
+				jdict['lastModified'] = str(data[8])
+				for commData in commentData:
+					commList.append(commData[1])
+				jdict['comments'] = commList
+				dbResponse=json.dumps(jdict,indent = 4)
+				return dbResponse
+			else:			
+				errorResponse = cust_error(404,"No such offer created !!!")
+				return errorResponse
+		except:
+			errorResponse = cust_error(500,"Something went wrong while processing at server side")
+			return errorResponse
+			cursor.close()		
+	except:
+		errorResponse = cust_error(500,"Internal Server Error !!!")
+		return errorResponse
+
+
+def getAllOffersByProductId(categoryId, productId):
+	try:
+		cursor = DBConnectionPool.dbconnect()
+		cursor.execute('SELECT * from Offer where productId=%s order by lastModified DESC',productId)
+		offerData = cursor.fetchall()
+		if not offerData:
+			errString = "No offers created for productId " + productId + "!!!"
+			errorResponse = cust_error(404,errString)
+			return errorResponse
+		else:	
+			offerDict = dict()
+			offerList = []
+			for data in offerData:
+				jdict = dict()
+				jdict['offerId'] = data[0]
+				jdict['buyingQty'] = data[1]
+				jdict['offeredDetails'] = data[2]
+				jdict['buyerStatus'] = data[3]
+				jdict['sellerStatus'] = data[4]
+				jdict['offerExpiry'] = str(data[5])
+				jdict['productId'] = data[6]
+				jdict['buyerId'] = data[7]
+				jdict['lastModified'] = str(data[8])
+				offerList.append(jdict)		
+			offerDict['offers'] = offerList		
+			dbResponse=json.dumps(offerDict,indent = 4)
+			return dbResponse						
+	except:
+		db.rollback()
+		errorResponse = cust_error(500,"Something went wrong while processing at server side")
+		cursor.close()
 		return errorResponse
