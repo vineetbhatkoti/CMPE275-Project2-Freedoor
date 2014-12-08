@@ -81,7 +81,7 @@ def createProduct(categoryId,jsonData):
 		return errorResponse
 
 def updateProduct(categoryId,productId,jsonData):
-
+	try:
 		cursor = DBConnectionPool.dbconnect()
 		quantity = jsonData['quantity']
 		productName = jsonData['productName']
@@ -91,44 +91,35 @@ def updateProduct(categoryId,productId,jsonData):
 		productExpiryDate = jsonData['productExpiryDate']
 		isValid = jsonData['isValid']
 		lastUpdated = jsonData['lastUpdated']
-		
-		try:
-			query="""UPDATE Product SET productName="%s", quantity=%s, expectedOffer="%s", productDesc="%s", productExpiryDate="%s", isValid=%s, categoryId=%s, lastUpdated="%s" WHERE productId=%s AND userId=%s""" %(productName,quantity,expectedOffer,productDesc,productExpiryDate,isValid,categoryId,lastUpdated,productId,userId)
-
-			print query
- 			cursor.execute(query)  
- 			cursor.connection.commit()
-
-			cursor.execute("SELECT * from Product where productId=%s AND userId=%s", (productId,userId))
-			row = cursor.fetchone()
-			if not row:
-				errString = "Not a Valid productId " + productId + "!!!"
-				errorResponse = cust_error(Constants.NOT_FOUND,errString)
-				return errorResponse
-			else:
-
-				d = dict()
-				d['productId'] = row[0]
-				d['productName'] = row[1]
-				d['quantity'] = row[2]
-				d['userId'] = row[3]
-				d['expectedOffer'] = row[4]
-				d['productDesc'] = row[5]
-				d['productExpiryDate'] = row[6]
-				d['isValid'] = row[7]
-				d['categoryId'] = row[8]
-				d['lastUpdated'] = row[9]
-
-				response = json.dumps(d, indent = 4)
-		#	print response
-		          	 	
-				return response      
-		except:
-			cursor.connection.rollback()
-			errorResponse = cust_error(Constants.INTERNAL_SERVER_ERROR,"Exception thrown while processing at server side")
+		query="""UPDATE Product SET productName="%s", quantity=%s, expectedOffer="%s", productDesc="%s", productExpiryDate="%s", isValid=%s, categoryId=%s, lastUpdated="%s" WHERE productId=%s AND userId=%s""" %(productName,quantity,expectedOffer,productDesc,productExpiryDate,isValid,categoryId,lastUpdated,productId,userId)
+		print query
+		cursor.execute(query)
+		cursor.connection.commit()
+		cursor.execute("SELECT * from Product where productId=%s AND userId=%s", (productId,userId))
+		row = cursor.fetchone()
+		if not row:
+			errString = "Not a Valid productId " + productId + "!!!"
+			errorResponse = cust_error(Constants.NOT_FOUND,errString)
 			return errorResponse
-	 	
-		cursor.close()
+		else:
+			d = dict()
+			d['productId'] = row[0]
+			d['productName'] = row[1]
+			d['quantity'] = row[2]
+			d['userId'] = row[3]
+			d['expectedOffer'] = row[4]
+			d['productDesc'] = row[5]
+			d['productExpiryDate'] = str(row[6])
+			d['isValid'] = row[7]
+			d['categoryId'] = row[8]
+			d['lastUpdated'] = str(row[9])
+			response = json.dumps(d, indent = 4)
+			return response
+			cursor.close()
+	except:
+		cursor.connection.rollback()
+		errorResponse = cust_error(Constants.INTERNAL_SERVER_ERROR,"Exception thrown while processing at server side")
+		return errorResponse
 		
 def getAllProductsByCategoryId(categoryId):
 	try:
