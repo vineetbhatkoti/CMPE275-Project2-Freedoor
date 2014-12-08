@@ -64,13 +64,14 @@ def createProduct(categoryId):
 	jsonData = json.loads(postData)
 	retData = ProductDB.createProduct(categoryId,jsonData)
 	return retData
-        
+              
 @route('/category/<categoryId>/product/<productId>', method='PUT')
 def updateProduct(categoryId,productId):
-	postData = request.body.read()
-	jsonData = json.loads(postData)
-	retData = ProductDB.updateProduct(categoryId,productId,jsonData)
-	return retData
+    postData = request.body.read()
+    jsonData = json.loads(postData)
+    response = ProductDB.updateProduct(categoryId,productId,jsonData)
+    return response
+
 
 # *************** Comment *********************************
 
