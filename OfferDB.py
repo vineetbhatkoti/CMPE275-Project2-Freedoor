@@ -47,8 +47,26 @@ def updateOffer(jsonData):
 		productId = jsonData['productId']
 		buyerId = jsonData['buyerId']
 		lastModified = jsonData['lastModified']
-	
+		
+		
 		cursor=DBConnectionPool.dbconnect()
+		
+		if buyerStatus == sellerStatus:
+			cursor.execute("SELECT quantity from Product WHERE productId =%s",(productId))
+			fRow = cursor.fetchone()
+			if not fRow:
+				errString = "Not a Valid productId " + productId + "!!!"
+				errorResponse = cust_error(Constants.NOT_FOUND,errString)
+				return errorResponse	
+			else:
+				if fRow[0]-buyingQty == 0:
+					cursor.execute("UPDATE Product SET quantity=%s,isValid=%s WHERE productId=%s",(0,0,productId))
+					cursor.connection.commit() 
+				else:
+					cursor.execute("UPDATE Product SET quantity=%s WHERE productId=%s",(fRow[0]-buyingQty,productId))
+					cursor.connection.commit() 
+					
+		
 		cursor.execute("UPDATE Offer SET buyingQty=%s, offeredDetails=%s, buyerStatus=%s, sellerStatus=%s, offerExpiry=%s, productId=%s, buyerId=%s, lastModified=%s WHERE offerId=%s",(buyingQty,offeredDetails,buyerStatus,sellerStatus,offerExpiry,productId,buyerId,lastModified,offerId))
 		cursor.connection.commit()  
 		cursor.execute("SELECT * from Offer where offerId=%s", (offerId))
