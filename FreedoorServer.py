@@ -108,7 +108,7 @@ def deleteOffer(categoryId,productId,offerId):
 @route('/category/<categoryId>/product/<productId>/offer/<offerId>', method='PUT')
 def updateOffer(categoryId,productId,offerId):
 	postData = request.body.read()
-	jsonData = json.loads(postdata)
+	jsonData = json.loads(postData)
 	retData = OfferDB.updateOffer(jsonData)
 	return retData
 
