@@ -30,7 +30,12 @@ def getProductById(categoryId, productId):
 		sql = "select * from Product where productId=%s and categoryId=%s"
 		cursor.execute(sql, (productId,categoryId))
 		row = cursor.fetchone()
-		if not row is None:
+		if not row:
+			cursor.close()
+			errString = "No Products for this categoryId " + categoryId + "!!!"
+			errorResponse = cust_error(404,errString)
+			return errorResponse
+		else:
 			d = dict()
 			d['productId'] = row[0]
 			d['productName'] = row[1]
@@ -38,22 +43,16 @@ def getProductById(categoryId, productId):
 			d['userId'] = row[3]
 			d['expectedOffer'] = row[4]
 			d['productDesc'] = row[5]
-			d['productExpiryDate'] = row[6]
+			d['productExpiryDate'] = str(row[6])
 			d['isValid'] = row[7]
 			d['categoryId'] = row[8]
-			d['lastUpdated'] = row[9]
-			response.headers['Content-Type'] = 'application/json'
-			response.status=200
+			d['lastUpdated'] = str(row[9])
 			dbResponse = json.dumps(d, indent = 4)
 			return dbResponse
-		else:
-			errorResponse = cust_error(404,"Product not found")
-			return errorResponse
 	except:
-		errorResponse = cust_error(500,"Something went wrong in processing at server side")
+		errorResponse = cust_error(500,"Product could not be found due to some exception")
 		cursor.close()
 		return errorResponse
-
 
 def createProduct(categoryId,jsonData):
 	try:
@@ -64,16 +63,18 @@ def createProduct(categoryId,jsonData):
 		productDesc = jsonData['productDesc']
 		productExpiryDate = jsonData['productExpiryDate']
 		isValid = jsonData['isValid']
-		categoryId = jsonData['categoryId']
-		lastUpdated = jsonData['lastUpdated']
+		categoryID = categoryId
+		now=datetime.now()
+		time = now.strftime('%Y-%m-%d %H:%M:%S')
 
 		cursor=DBConnectionPool.dbconnect()
-		prodSql = """Insert into Product (productName,quantity,userId,expectedOffer,productDesc,productExpiryDate,isValid,categoryId,lastUpdated) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s)"""
-		cursor.execute(prodSql, (productName,quantity,userId,expectedOffer,productDesc,productExpiryDate,isValid,categoryId,lastUpdated))
+		prodSql = """Insert into Product(productName,quantity,userId,expectedOffer,productDesc,productExpiryDate,isValid,categoryId,lastUpdated) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s)"""
+		cursor.execute(prodSql, (productName,quantity,userId,expectedOffer,productDesc,productExpiryDate,isValid,categoryID,time))
 		cursor.connection.commit()
 		product_id = cursor.connection.insert_id()
 		cursor.close()
-		return getProductById(categoryId,product_id)
+		createdProduct = getProductById(categoryId,product_id)
+		return createdProduct
 	except:
 		errorResponse = cust_error(500,"Product could not be created successfully due to exception.")
 		cursor.close()
