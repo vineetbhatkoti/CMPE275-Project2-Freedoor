@@ -3,6 +3,7 @@ import json
 import DBConnectionPool
 from bottle import error,response
 from Constants import Constants
+from datetime import datetime
 
 def cust_error(statuscode,message):
 	error = dict();
@@ -66,14 +67,28 @@ def updateOffer(jsonData):
 				else:
 					cursor.execute("UPDATE Product SET quantity=%s WHERE productId=%s",(int(fRow[0])-int(buyingQty),productId))
 					cursor.connection.commit() 
-					
-		cursor.execute('SELECT * from Comment where offerId=%s',offerId)
+		
+		cursor.execute('SELECT buyingQty from Offer where offerId=%s',(offerId))
+		offerQty=cursor.fetchone()
+		#cursor.close()
+		
+		modify=str("old"+`offerQty[0]`+":"+"new"+`buyingQty`)
+	
+		now=datetime.now()
+		time = now.strftime('%Y-%m-%d %H:%M:%S')
+		
+		print "DB1*****"
+		sqlForOfferHistory = """INSERT INTO OfferHistory(modified,lastModified,offerId) VALUES (%s,%s,%s)"""
+		cursor.execute(sqlForOfferHistory, (modify,str(time),offerId))		
+		cursor.connection.commit()  
+		print "DB2*****"
+		cursor.execute('SELECT * from Comment where offerId=%s',(offerId))
 		commentData = cursor.fetchall()
 		commList = []
-
+		print "DB3*****"
 		cursor.execute("UPDATE Offer SET buyingQty=%s,offeredDetails=%s,buyerStatus=%s,sellerStatus=%s,offerExpiry=%s,productId=%s,buyerId=%s,lastModified=%s WHERE offerId=%s",(buyingQty,offeredDetails,buyerStatus,sellerStatus,offerExpiry,productId,buyerId,lastModified,offerId))
 		cursor.connection.commit()  
-		cursor.execute("SELECT * from Offer where offerId=%s", (offerId))
+		cursor.execute('SELECT * from Offer where offerId=%s', (offerId))
 		row = cursor.fetchone()
 		if not row:
 			errString = "Not a Valid productId " + productId + "!!!"
