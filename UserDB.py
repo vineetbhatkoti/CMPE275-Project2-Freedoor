@@ -1,6 +1,7 @@
 import pymysql
 import json
 import DBConnectionPool
+from bottle import error,response
 
 def cust_error(statuscode,message):
     error = dict()
@@ -31,7 +32,6 @@ def getByUserId(userId):
             return errorResponse
     except:
         errorResponse = cust_error(500,"User could not be found due to some exception")
-        cursor.close()
         return errorResponse
 
 def createUser(jsonData):

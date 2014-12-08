@@ -11,8 +11,8 @@ from bottle import route, run, template, request, response, get , post, error
 
 @route('/users/<userId>',method='GET')
 def getByUserId(userId):
-    retData = UserDB.getByUserId(userId)
-    return retData
+	retData = UserDB.getByUserId(userId)
+	return retData
 
 @route('/users', method='POST')
 def createUser():
