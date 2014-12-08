@@ -40,8 +40,29 @@ def updateOffer(jsonData):
 	
 		cursor=DBConnectionPool.dbconnect()
 		cursor.execute("UPDATE Offer SET buyingQty=%s, offeredDetails=%s, buyerStatus=%s, sellerStatus=%s, offerExpiry=%s, productId=%s, buyerId=%s, lastModified=%s WHERE offerId=%s",(buyingQty,offeredDetails,buyerStatus,sellerStatus,offerExpiry,productId,buyerId,lastModified,offerId))
-		cursor.connection.commit()   
-		cursor.close()       
+		cursor.connection.commit()  
+		cursor.execute("SELECT * from Offer where offerId=%s", (offerId))
+		row = cursor.fetchone()
+		if not row:
+			errString = "Not a Valid productId " + productId + "!!!"
+			errorResponse = cust_error(404,errString)
+			return errorResponse
+		else:
+			d = dict()
+			d['offerId'] = row[0]
+			d['buyingQty'] = row[1]
+			d['offeredDetails'] = str(row[2])
+			d['buyerStatus'] = row[3]
+			d['sellerStatus'] = row[4]
+			d['offerExpiry'] = str(row[5])
+			d['productId'] = row[6]
+			d['buyerId'] = row[7]
+			d['lastModified'] = str(row[8])
+			
+			response = json.dumps(d, indent = 4)
+			cursor.close() 
+			return response 
+		      
 	except:
 		cursor.close()
 		errorResponse = cust_error(500,"Offer could not be updated successfully due to some exception.")
