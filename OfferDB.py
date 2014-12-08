@@ -11,6 +11,16 @@ def cust_error(statuscode,message):
 	response.status =statuscode
 	response.headers['Content-Type'] = 'application/json'
 	return errorResponse
+	
+def cust_success(statuscode,message):
+	success = dict();
+	success['status'] = statuscode
+	success['message'] = message
+	successResponse = json.dumps(success, indent = 4)
+	response.status =statuscode
+	response.headers['Content-Type'] = 'application/json'
+	print successResponse
+	return successResponse
 
 def deleteOffer(offerId):
 	try:
@@ -19,11 +29,11 @@ def deleteOffer(offerId):
 		cursor.connection.commit()
 		cursor.close()
 		response.headers['Content-Type'] = 'application/json'
-		response.status=200
+		response=cust_success(Constants.SUCCESS,"Successfully deleted the Offer !!")
 		return response
 	except:
 		cursor.close()
-		errorResponse = cust_error(500,"Offer could not be deleted due to some exception.")
+		errorResponse = cust_error(Constants.INTERNAL_SERVER_ERROR,"Offer could not be deleted due to some exception.")
 		return errorResponse
 	
 def updateOffer(jsonData):
@@ -45,7 +55,7 @@ def updateOffer(jsonData):
 		row = cursor.fetchone()
 		if not row:
 			errString = "Not a Valid productId " + productId + "!!!"
-			errorResponse = cust_error(404,errString)
+			errorResponse = cust_error(Constants.NOT_FOUND,errString)
 			return errorResponse
 		else:
 			d = dict()
@@ -65,7 +75,7 @@ def updateOffer(jsonData):
 		      
 	except:
 		cursor.close()
-		errorResponse = cust_error(500,"Offer could not be updated successfully due to some exception.")
+		errorResponse = cust_error(Constants.INTERNAL_SERVER_ERROR,"Offer could not be updated successfully due to some exception.")
 		return errorResponse
 	
 def getOfferById(offerId):
@@ -93,12 +103,12 @@ def getOfferById(offerId):
 			cursor.close()
 			return dbResponse
 		else:
-			errorResponse = cust_error(404,"Offer not found. Please check your offerid.")
+			errorResponse = cust_error(Constants.NOT_FOUND,"Offer not found. Please check your offerid.")
 			cursor.close()
 			return errorResponse
 	except:
 		cursor.close()
-		errorResponse = cust_error(500,"Offer could not be retrieved successfully due to som eexception.")
+		errorResponse = cust_error(Constants.INTERNAL_SERVER_ERROR,"Offer could not be retrieved successfully due to som eexception.")
 		return errorResponse
 
 def createOfferByProductId(categoryId, productId,jsonData):
@@ -146,14 +156,14 @@ def createOfferByProductId(categoryId, productId,jsonData):
 				dbResponse=json.dumps(jdict,indent = 4)
 				return dbResponse
 			else:			
-				errorResponse = cust_error(404,"No such offer created !!!")
+				errorResponse = cust_error(Constants.NOT_FOUND,"No such offer created !!!")
 				return errorResponse
 		except:
-			errorResponse = cust_error(500,"Something went wrong while processing at server side")
+			errorResponse = cust_error(Constants.INTERNAL_SERVER_ERROR,"Something went wrong while processing at server side")
 			return errorResponse
 			cursor.close()		
 	except:
-		errorResponse = cust_error(500,"Internal Server Error !!!")
+		errorResponse = cust_error(Constants.INTERNAL_SERVER_ERROR,"Internal Server Error !!!")
 		return errorResponse
 
 
@@ -164,7 +174,7 @@ def getAllOffersByProductId(categoryId, productId):
 		offerData = cursor.fetchall()
 		if not offerData:
 			errString = "No offers created for productId " + productId + "!!!"
-			errorResponse = cust_error(404,errString)
+			errorResponse = cust_error(Constants.NOT_FOUND,errString)
 			return errorResponse
 		else:	
 			offerDict = dict()
@@ -186,6 +196,6 @@ def getAllOffersByProductId(categoryId, productId):
 			return dbResponse						
 	except:
 		db.rollback()
-		errorResponse = cust_error(500,"Something went wrong while processing at server side")
+		errorResponse = cust_error(Constants.INTERNAL_SERVER_ERROR,"Something went wrong while processing at server side")
 		cursor.close()
 		return errorResponse

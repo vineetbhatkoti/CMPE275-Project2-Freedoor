@@ -33,7 +33,7 @@ def getProductById(categoryId, productId):
 		if not row:
 			cursor.close()
 			errString = "No Products for this categoryId " + categoryId + "!!!"
-			errorResponse = cust_error(404,errString)
+			errorResponse = cust_error(Constants.NOT_FOUND,errString)
 			return errorResponse
 		else:
 			d = dict()
@@ -50,7 +50,7 @@ def getProductById(categoryId, productId):
 			dbResponse = json.dumps(d, indent = 4)
 			return dbResponse
 	except:
-		errorResponse = cust_error(500,"Product could not be found due to some exception")
+		errorResponse = cust_error(Constants.INTERNAL_SERVER_ERROR,"Product could not be found due to some exception")
 		cursor.close()
 		return errorResponse
 
@@ -76,7 +76,7 @@ def createProduct(categoryId,jsonData):
 		createdProduct = getProductById(categoryId,product_id)
 		return createdProduct
 	except:
-		errorResponse = cust_error(500,"Product could not be created successfully due to exception.")
+		errorResponse = cust_error(Constants.INTERNAL_SERVER_ERROR,"Product could not be created successfully due to exception.")
 		cursor.close()
 		return errorResponse
 
@@ -103,7 +103,7 @@ def updateProduct(categoryId,productId,jsonData):
 			row = cursor.fetchone()
 			if not row:
 				errString = "Not a Valid productId " + productId + "!!!"
-				errorResponse = cust_error(404,errString)
+				errorResponse = cust_error(Constants.NOT_FOUND,errString)
 				return errorResponse
 			else:
 
@@ -125,7 +125,7 @@ def updateProduct(categoryId,productId,jsonData):
 				return response      
 		except:
 			cursor.connection.rollback()
-			errorResponse = cust_error(500,"Exception thrown while processing at server side")
+			errorResponse = cust_error(Constants.INTERNAL_SERVER_ERROR,"Exception thrown while processing at server side")
 			return errorResponse
 	 	
 		cursor.close()
@@ -138,7 +138,7 @@ def getAllProductsByCategoryId(categoryId):
 		
 		if not productData:
 			errString = "No Products for this categoryId " + categoryId + "!!!"
-			errorResponse = cust_error(404,errString)
+			errorResponse = cust_error(Constants.NOT_FOUND,errString)
 			return errorResponse
 		else:	
 			productDict = dict()
@@ -161,7 +161,7 @@ def getAllProductsByCategoryId(categoryId):
 			dbResponse=json.dumps(productDict,indent = 4)
 			return dbResponse						
 	except:
-		errorResponse = cust_error(500,"Something went wrong while processing at server side")
+		errorResponse = cust_error(Constants.INTERNAL_SERVER_ERROR,"Something went wrong while processing at server side")
 		cursor.close()
 		return errorResponse
 
@@ -173,9 +173,9 @@ def deleteProduct(categoryId,productId):
 		cursor.execute('DELETE from Product where productId=%s and categoryId=%s',(productId,categoryId))
 		cursor.connection.commit()
 		cursor.close()
-		response=cust_success(200,"Successfully deleted the product !!")
+		response=cust_success(Constants.SUCCESS,"Successfully deleted the product !!")
 		return response
 	except:
 		cursor.close()
-		errorResponse = cust_error(500,"Something went wrong in deleting Product at server side")
+		errorResponse = cust_error(Constants.INTERNAL_SERVER_ERROR,"Something went wrong in deleting Product at server side")
 		return errorResponse
