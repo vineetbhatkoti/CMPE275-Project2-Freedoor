@@ -26,7 +26,7 @@ def createUser():
 # **************** Category ***************************
 
 @route('/category', method='GET')
-def getAwordllCategories():
+def getAllCategories():
 	retData = CategoryDB.getAllCategories()
 	return retData
 
@@ -91,9 +91,6 @@ def createOffer(categoryId,productId):
 	jsonData = json.loads(postData)
 	retData = OfferDB.createOfferByProductId(categoryId,productId,jsonData)
 	return retData
-
-
-
 
 @route('/category/<categoryId>/product/<productId>/offer', method='GET')
 def getAllOffersByProductId(categoryId,productId):
