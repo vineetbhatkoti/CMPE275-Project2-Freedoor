@@ -70,18 +70,18 @@ def updateOffer(jsonData):
 		
 		cursor.execute('SELECT buyingQty from Offer where offerId=%s',(offerId))
 		offerQty=cursor.fetchone()
-		#cursor.close()
+		
 		
 		modify=str("old"+`offerQty[0]`+":"+"new"+`buyingQty`)
 	
 		now=datetime.now()
 		time = now.strftime('%Y-%m-%d %H:%M:%S')
 		
-		print "DB1*****"
+		
 		sqlForOfferHistory = """INSERT INTO OfferHistory(modified,lastModified,offerId) VALUES (%s,%s,%s)"""
 		cursor.execute(sqlForOfferHistory, (modify,str(time),offerId))		
 		cursor.connection.commit()  
-		print "DB2*****"
+		
 		cursor.execute('SELECT * from Comment where offerId=%s',(offerId))
 		commentData = cursor.fetchall()
 		commList = []
