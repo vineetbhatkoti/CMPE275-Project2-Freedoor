@@ -56,17 +56,17 @@ def getProductById(categoryId, productId):
 
 def createProduct(categoryId,jsonData):
 	try:
-		productName = jsonData['productName']
+		productName = str(jsonData['productName'])
 		quantity = jsonData['quantity']
 		userId = jsonData['userId']
-		expectedOffer = jsonData['expectedOffer']
-		productDesc = jsonData['productDesc']
-		productExpiryDate = jsonData['productExpiryDate']
+		expectedOffer = str(jsonData['expectedOffer'])
+		productDesc = str(jsonData['productDesc'])
+		productExpiryDate = str(jsonData['productExpiryDate'])
 		isValid = jsonData['isValid']
 		categoryID = categoryId
 		now=datetime.now()
-		time = now.strftime('%Y-%m-%d %H:%M:%S')
-
+		time = str(now.strftime('%Y-%m-%d %H:%M:%S'))
+	
 		cursor=DBConnectionPool.dbconnect()
 		prodSql = """Insert into Product(productName,quantity,userId,expectedOffer,productDesc,productExpiryDate,isValid,categoryId,lastUpdated) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s)"""
 		cursor.execute(prodSql, (productName,quantity,userId,expectedOffer,productDesc,productExpiryDate,isValid,categoryID,time))
