@@ -30,7 +30,6 @@ def deleteOffer(offerId):
 		cursor.execute("DELETE FROM Offer WHERE offerId=%s",(offerId))
 		cursor.connection.commit()
 		cursor.close()
-		response.headers['Content-Type'] = 'application/json'
 		response=cust_success(Constants.SUCCESS,"Successfully deleted the Offer !!")
 		return response
 	except:
@@ -40,19 +39,16 @@ def deleteOffer(offerId):
 	
 def updateOffer(jsonData):
 	try:
+		cursor=DBConnectionPool.dbconnect()
 		offerId = jsonData['offerId']
 		buyingQty = jsonData['buyingQty']
-		offeredDetails = str(jsonData['offeredDetails'])
-		buyerStatus = str(jsonData['buyerStatus'])
-		sellerStatus = str(jsonData['sellerStatus'])
+		offeredDetails = jsonData['offeredDetails']
+		buyerStatus = jsonData['buyerStatus']
+		sellerStatus = jsonData['sellerStatus']
 		offerExpiry = str(jsonData['offerExpiry'])
 		productId = jsonData['productId']
 		buyerId = jsonData['buyerId']
 		lastModified = str(jsonData['lastModified'])
-		
-		
-		cursor=DBConnectionPool.dbconnect()
-		
 		if buyerStatus == sellerStatus:
 			cursor.execute("SELECT quantity from Product WHERE productId =%s",(productId))
 			fRow = cursor.fetchone()
@@ -130,14 +126,12 @@ def getOfferById(offerId):
 			d['offeredDetails'] = row[2]
 			d['buyerStatus'] = row[3]
 			d['sellerStatus'] = row[4]
-			d['offerExpiry'] = row[5]
+			d['offerExpiry'] = str(row[5])
 			d['productId'] = row[6]
 			d['buyerId'] = row[7]
-			d['lastModified'] = row[8]
+			d['lastModified'] = str(row[8])
 			d['comments'] = ""
 			d['lastEvent'] = ""
-			response.headers['Content-Type'] = 'application/json'
-			response.status=200
 			dbResponse = json.dumps(d, indent = 4)
 			cursor.close()
 			return dbResponse
@@ -147,63 +141,63 @@ def getOfferById(offerId):
 			return errorResponse
 	except:
 		cursor.close()
-		errorResponse = cust_error(Constants.INTERNAL_SERVER_ERROR,"Offer could not be retrieved successfully due to som eexception.")
+		errorResponse = cust_error(Constants.INTERNAL_SERVER_ERROR,"Offer could not be retrieved successfully due to some exception.")
 		return errorResponse
 
 def createOfferByProductId(categoryId, productId,jsonData):
-	try:
+#	try:
 		cursor = DBConnectionPool.dbconnect()
 		buyingQty = jsonData['buyingQty']
 		offeredDetails = jsonData['offeredDetails']
 		buyerStatus = jsonData['buyerStatus']
 		sellerStatus = jsonData['sellerStatus']
-		offerExpiry = jsonData['offerExpiry']
+		offerExpiry = str(jsonData['offerExpiry'])
 		buyerId = jsonData['buyerId']
 		commentDesc = jsonData['comments']
 		now=datetime.now()
 		time = now.strftime('%Y-%m-%d %H:%M:%S')
 		
-		try:
-			sql = """Insert into Offer (buyingQty,offeredDetails,buyerStatus,sellerStatus,offerExpiry,productId,buyerId,lastModified) VALUES (%s,%s,%s,%s,%s,%s,%s,%s)"""
-			cursor.execute(sql, (buyingQty,offeredDetails,buyerStatus,sellerStatus,offerExpiry,productId,buyerId,time))
-			row = cursor.connection.commit()
-			offerId = cursor.connection.insert_id()
-			commentSql = """Insert into Comment (commentDesc,lastUpdated,offerId,userId) VALUES (%s,%s,%s,%s)"""
-			cursor.execute(commentSql, (commentDesc,time,offerId,buyerId))
-			row1 = cursor.connection.commit()
-			cursor.execute('SELECT * from Offer where offerId=%s',offerId)
-			data = cursor.fetchone()
+#		try:
+		sql = """Insert into Offer (buyingQty,offeredDetails,buyerStatus,sellerStatus,offerExpiry,productId,buyerId,lastModified) VALUES (%s,%s,%s,%s,%s,%s,%s,%s)"""
+		cursor.execute(sql, (buyingQty,offeredDetails,buyerStatus,sellerStatus,offerExpiry,productId,buyerId,time))
+		row = cursor.connection.commit()
+		offerId = cursor.connection.insert_id()
+		commentSql = """Insert into Comment (commentDesc,lastUpdated,offerId,userId) VALUES (%s,%s,%s,%s)"""
+		cursor.execute(commentSql, (commentDesc,time,offerId,buyerId))
+		row1 = cursor.connection.commit()
+		cursor.execute('SELECT * from Offer where offerId=%s',offerId)
+		data = cursor.fetchone()
 	
-			cursor.execute('SELECT * from Comment where offerId=%s',offerId)
-			commentData = cursor.fetchall()
+		cursor.execute('SELECT * from Comment where offerId=%s',offerId)
+		commentData = cursor.fetchall()
 	
-			commList = []
-			if not data is None:
-				jdict = dict()
-				jdict['offerId'] = data[0]
-				jdict['buyingQty'] = data[1]
-				jdict['offeredDetails'] = data[2]
-				jdict['buyerStatus'] = data[3]
-				jdict['sellerStatus'] = data[4]
-				jdict['offerExpiry'] = str(data[5])
-				jdict['productId'] = data[6]
-				jdict['buyerId'] = data[7]
-				jdict['lastModified'] = str(data[8])
-				for commData in commentData:
-					commList.append(commData[1])
-				jdict['comments'] = commList
-				dbResponse=json.dumps(jdict,indent = 4)
-				return dbResponse
-			else:			
-				errorResponse = cust_error(Constants.NOT_FOUND,"No such offer created !!!")
-				return errorResponse
-		except:
-			errorResponse = cust_error(Constants.INTERNAL_SERVER_ERROR,"Something went wrong while processing at server side")
+		commList = []
+		if not data is None:
+			jdict = dict()
+			jdict['offerId'] = data[0]
+			jdict['buyingQty'] = data[1]
+			jdict['offeredDetails'] = data[2]
+			jdict['buyerStatus'] = data[3]
+			jdict['sellerStatus'] = data[4]
+			jdict['offerExpiry'] = str(data[5])
+			jdict['productId'] = data[6]
+			jdict['buyerId'] = data[7]
+			jdict['lastModified'] = str(data[8])
+			for commData in commentData:
+				commList.append(commData[1])
+			jdict['comments'] = commList
+			dbResponse=json.dumps(jdict,indent = 4)
+			return dbResponse
+		else:			
+			errorResponse = cust_error(Constants.NOT_FOUND,"No such offer created !!!")
 			return errorResponse
-			cursor.close()		
-	except:
-		errorResponse = cust_error(Constants.INTERNAL_SERVER_ERROR,"Internal Server Error !!!")
-		return errorResponse
+#		except:
+#			errorResponse = cust_error(Constants.INTERNAL_SERVER_ERROR,"Something went wrong while processing at server side")
+#			return errorResponse
+#			cursor.close()		
+#	except:
+#		errorResponse = cust_error(Constants.INTERNAL_SERVER_ERROR,"Internal Server Error !!!")
+#		return errorResponse
 
 
 def getAllOffersByProductId(categoryId, productId):

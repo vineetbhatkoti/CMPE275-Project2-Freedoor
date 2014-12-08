@@ -74,6 +74,35 @@ def updateProduct(categoryId,productId):
     response = ProductDB.updateProduct(categoryId,productId,jsonData)
     return response
 
+# ********************* Offer *************************************
+@route('/category/<categoryId>/product/<productId>/offer', method='GET')
+def getAllOffersByProductId(categoryId,productId):
+	retData = OfferDB.getAllOffersByProductId(categoryId,productId)
+	return retData
+
+@route('/category/<categoryId>/product/<productId>/offer/<offerId>', method='GET')
+def getOfferById(categoryId,productId,offerId):
+	retData = OfferDB.getOfferById(offerId)
+	return retData
+
+@route('/category/<categoryId>/product/<productId>/offer', method='POST')
+def createOffer(categoryId,productId):
+	postData = request.body.read()
+	jsonData = json.loads(postData)
+	retData = OfferDB.createOfferByProductId(categoryId,productId,jsonData)
+	return retData
+
+@route('/category/<categoryId>/product/<productId>/offer/<offerId>', method='PUT')
+def updateOffer(categoryId,productId,offerId):
+	postData = request.body.read()
+	jsonData = json.loads(postData)
+	retData = OfferDB.updateOffer(jsonData)
+	return retData
+
+@route('/category/<categoryId>/product/<productId>/offer/<offerId>', method='DELETE')
+def deleteOffer(categoryId,productId,offerId):
+	status = OfferDB.deleteOffer(offerId)
+	return status
 
 # *************** Comment *********************************
 
@@ -82,36 +111,6 @@ def createCommentByOfferId(categoryId,productId,offerId):
 	postData = request.body.read()
 	jsonData = json.loads(postData)
 	retData = CommentDB.createCommentByOfferId(categoryId,productId,offerId,jsonData)
-	return retData
-
-# ********************* Offer *************************************
-@route('/category/<categoryId>/product/<productId>/offer', method='POST')
-def createOffer(categoryId,productId):
-	postData = request.body.read()
-	jsonData = json.loads(postData)
-	retData = OfferDB.createOfferByProductId(categoryId,productId,jsonData)
-	return retData
-
-@route('/category/<categoryId>/product/<productId>/offer', method='GET')
-def getAllOffersByProductId(categoryId,productId):
-	retData = OfferDB.getAllOffersByProductId(categoryId,productId)
-	return retData
-
-@route('/category/<categoryId>/product/<productId>/offer/<offerId>', method='DELETE')
-def deleteOffer(categoryId,productId,offerId):
-	status = OfferDB.deleteOffer(offerId)
-	return status
-	
-@route('/category/<categoryId>/product/<productId>/offer/<offerId>', method='PUT')
-def updateOffer(categoryId,productId,offerId):
-	postData = request.body.read()
-	jsonData = json.loads(postData)
-	retData = OfferDB.updateOffer(jsonData)
-	return retData
-
-@route('/category/<categoryId>/product/<productId>/offer/<offerId>', method='GET')
-def getOfferById(categoryId,productId,offerId):
-	retData = OfferDB.getOfferById(offerId)
 	return retData
 
 run(host='localhost', port=8090)
