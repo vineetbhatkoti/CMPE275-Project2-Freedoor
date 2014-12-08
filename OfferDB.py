@@ -41,13 +41,13 @@ def updateOffer(jsonData):
 	try:
 		offerId = jsonData['offerId']
 		buyingQty = jsonData['buyingQty']
-		offeredDetails = jsonData['offeredDetails']
-		buyerStatus = jsonData['buyerStatus']
-		sellerStatus = jsonData['sellerStatus']
-		offerExpiry = jsonData['offerExpiry']
+		offeredDetails = str(jsonData['offeredDetails'])
+		buyerStatus = str(jsonData['buyerStatus'])
+		sellerStatus = str(jsonData['sellerStatus'])
+		offerExpiry = str(jsonData['offerExpiry'])
 		productId = jsonData['productId']
 		buyerId = jsonData['buyerId']
-		lastModified = jsonData['lastModified']
+		lastModified = str(jsonData['lastModified'])
 		
 		
 		cursor=DBConnectionPool.dbconnect()
@@ -60,17 +60,18 @@ def updateOffer(jsonData):
 				errorResponse = cust_error(Constants.NOT_FOUND,errString)
 				return errorResponse	
 			else:
-				if fRow[0]-buyingQty == 0:
+				if int(fRow[0])-int(buyingQty) == 0:
 					cursor.execute("UPDATE Product SET quantity=%s,isValid=%s WHERE productId=%s",(0,0,productId))
 					cursor.connection.commit() 
 				else:
-					cursor.execute("UPDATE Product SET quantity=%s WHERE productId=%s",(fRow[0]-buyingQty,productId))
+					cursor.execute("UPDATE Product SET quantity=%s WHERE productId=%s",(int(fRow[0])-int(buyingQty),productId))
 					cursor.connection.commit() 
 					
 		cursor.execute('SELECT * from Comment where offerId=%s',offerId)
 		commentData = cursor.fetchall()
 		commList = []
-		cursor.execute("UPDATE Offer SET buyingQty=%s, offeredDetails=%s, buyerStatus=%s, sellerStatus=%s, offerExpiry=%s, productId=%s, buyerId=%s, lastModified=%s WHERE offerId=%s",(buyingQty,offeredDetails,buyerStatus,sellerStatus,offerExpiry,productId,buyerId,lastModified,offerId))
+
+		cursor.execute("UPDATE Offer SET buyingQty=%s,offeredDetails=%s,buyerStatus=%s,sellerStatus=%s,offerExpiry=%s,productId=%s,buyerId=%s,lastModified=%s WHERE offerId=%s",(buyingQty,offeredDetails,buyerStatus,sellerStatus,offerExpiry,productId,buyerId,lastModified,offerId))
 		cursor.connection.commit()  
 		cursor.execute("SELECT * from Offer where offerId=%s", (offerId))
 		row = cursor.fetchone()
@@ -97,9 +98,9 @@ def updateOffer(jsonData):
 			return response 
 		      
 	except:
-		cursor.close()
-		errorResponse = cust_error(Constants.INTERNAL_SERVER_ERROR,"Offer could not be updated successfully due to some exception.")
-		return errorResponse
+			cursor.close()
+			errorResponse = cust_error(Constants.INTERNAL_SERVER_ERROR,"Offer could not be updated successfully due to some exception.")
+			return errorResponse
 	
 def getOfferById(offerId):
 	try:
