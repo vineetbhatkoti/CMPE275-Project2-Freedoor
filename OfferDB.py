@@ -66,7 +66,9 @@ def updateOffer(jsonData):
 					cursor.execute("UPDATE Product SET quantity=%s WHERE productId=%s",(fRow[0]-buyingQty,productId))
 					cursor.connection.commit() 
 					
-		
+		cursor.execute('SELECT * from Comment where offerId=%s',offerId)
+		commentData = cursor.fetchall()
+		commList = []
 		cursor.execute("UPDATE Offer SET buyingQty=%s, offeredDetails=%s, buyerStatus=%s, sellerStatus=%s, offerExpiry=%s, productId=%s, buyerId=%s, lastModified=%s WHERE offerId=%s",(buyingQty,offeredDetails,buyerStatus,sellerStatus,offerExpiry,productId,buyerId,lastModified,offerId))
 		cursor.connection.commit()  
 		cursor.execute("SELECT * from Offer where offerId=%s", (offerId))
@@ -86,7 +88,9 @@ def updateOffer(jsonData):
 			d['productId'] = row[6]
 			d['buyerId'] = row[7]
 			d['lastModified'] = str(row[8])
-			
+			for commData in commentData:
+				commList.append(commData[1])
+			d['comments'] = commList
 			response = json.dumps(d, indent = 4)
 			cursor.close() 
 			return response 
