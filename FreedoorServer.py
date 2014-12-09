@@ -4,9 +4,18 @@ import CommentDB
 import ProductDB
 import OfferDB
 import CategoryDB
-
+import OfferHistoryDB
+from Constants import Constants
 from bottle import route, run, template, request, response, get , post, error
 
+def cust_error(statuscode,message):
+    error = dict()
+    error[Constants.STATUS] = statuscode
+    error[Constants.MESSAGE] = message
+    errorResponse = json.dumps(error, indent = 4)
+    response.status =statuscode
+    response.headers[Constants.CONTENT] = Constants.CONTENT_TYPE
+    return errorResponse
 # **************** User *******************************
 
 @route('/users/<userId>',method='GET')
@@ -16,13 +25,22 @@ def getByUserId(userId):
 
 @route('/users', method='POST')
 def createUser():
-	print "in making users"
-	postData = request.body.read()
-	jsonData = json.loads(postData)
-	print jsonData
-	retData = UserDB.createUser(jsonData)
-	return retData
+	try:
+		print "in making users"
+		postData = request.body.read()
+		jsonData = json.loads(postData)
+		emailId=jsonData[Constants.EMAILID]
+		print "Email Id is " +emailId
+		if emailId is None or emailId=="":
+			errorResponse = cust_error(Constants.BAD_DATA,Constants.EMAIL_VALIDATION)
+			return errorResponse
+		else:
 
+			retData = UserDB.createUser(jsonData)
+			return retData
+	except:
+		errorResponse = cust_error(Constants.BAD_DATA,Constants.REQUIRED_FIELD_MISSING)
+		return errorResponse
 # **************** Category ***************************
 
 @route('/category', method='GET')
@@ -37,13 +55,34 @@ def getCategoryById(categoryId):
 
 @route('/category', method='POST')
 def createCategoryByName():
-	postData = request.body.read()
-	jsonData = json.loads(postData)
-	categoryName = jsonData['categoryName']
-	retData = CategoryDB.createCategoryByName(categoryName)
-	return retData
+	try:
+		postData = request.body.read()
+		jsonData = json.loads(postData)
+		categoryName = jsonData['categoryName']
+		print "Email Id is " +categoryName
+		if categoryName is None or categoryName=="":
+			errorResponse = cust_error(Constants.BAD_DATA,Constants.CATEGORY_NAME_VALIDATION)
+			return errorResponse
+		else:
+			retData = CategoryDB.createCategoryByName(categoryName)
+			return retData
+	except:
+		errorResponse = cust_error(Constants.BAD_DATA,Constants.REQUIRED_FIELD_MISSING)
+		return errorResponse	
 
 # **************** Product ****************************
+
+def validate_productData(jsonData):
+	productName = jsonData['productName']
+	quantity = jsonData['quantity']
+	userId = jsonData['userId']
+	productExpiryDate = str(jsonData['productExpiryDate'])
+	isValid = jsonData['isValid']
+	#print "Email Id is " +categoryName
+	if productName is None or productName=="" or quantity is None or quantity=="" or int(quantity) < 0 or userId is None or userId=="" or productExpiryDate is None or productExpiryDate =="" or isValid is None or isValid=="":
+			return False	
+	else:		
+			return True
 
 @route('/category/<categoryId>/product', method='GET')
 def getAllProductsByCategoryId(categoryId):
@@ -62,11 +101,20 @@ def getProductById(categoryId,productId):
 
 @route('/category/<categoryId>/product', method='POST')
 def createProduct(categoryId):
-	postData = request.body.read()
-	jsonData = json.loads(postData)
-	retData = ProductDB.createProduct(categoryId,jsonData)
-	return retData
-              
+	try:
+		postData = request.body.read()
+		jsonData = json.loads(postData)
+		isJSONValid = validate_productData(jsonData)
+		if isJSONValid:
+			retData = ProductDB.createProduct(categoryId,jsonData)
+			return retData
+		else:
+			errorResponse = cust_error(Constants.BAD_DATA,Constants.JSON_INVALID)
+			return errorResponse
+	except:
+		errorResponse = cust_error(Constants.BAD_DATA,Constants.REQUIRED_FIELD_MISSING)
+		return errorResponse				
+
 @route('/category/<categoryId>/product/<productId>', method='PUT')
 def updateProduct(categoryId,productId):
     postData = request.body.read()
@@ -96,7 +144,7 @@ def createOffer(categoryId,productId):
 def updateOffer(categoryId,productId,offerId):
 	postData = request.body.read()
 	jsonData = json.loads(postData)
-	retData = OfferDB.updateOffer(jsonData)
+	retData = OfferDB.updateOffer(productId,offerId,jsonData)
 	return retData
 
 @route('/category/<categoryId>/product/<productId>/offer/<offerId>', method='DELETE')
@@ -113,4 +161,12 @@ def createCommentByOfferId(categoryId,productId,offerId):
 	retData = CommentDB.createCommentByOfferId(categoryId,productId,offerId,jsonData)
 	return retData
 
+# ***************** Offer History *****************************
+
+@route('/category/<categoryId>/product/<productId>/offer/<offerId>/history')
+def getOfferHistoryByOfferId(categoryId, productId, offerId):
+	retData1 = OfferHistoryDB.getOfferHistoryByOfferId(offerId)
+	return retData1
+
 run(host='localhost', port=8090)
+

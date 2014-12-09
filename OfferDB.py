@@ -37,18 +37,17 @@ def deleteOffer(offerId):
 		errorResponse = cust_error(Constants.INTERNAL_SERVER_ERROR,"Offer could not be deleted due to some exception.")
 		return errorResponse
 	
-def updateOffer(jsonData):
-	try:
+def updateOffer(productId,offerId,jsonData):
+	
 		cursor=DBConnectionPool.dbconnect()
-		offerId = jsonData['offerId']
 		buyingQty = jsonData['buyingQty']
 		offeredDetails = jsonData['offeredDetails']
 		buyerStatus = jsonData['buyerStatus']
 		sellerStatus = jsonData['sellerStatus']
 		offerExpiry = str(jsonData['offerExpiry'])
-		productId = jsonData['productId']
+		#productId = jsonData['productId']
 		buyerId = jsonData['buyerId']
-		lastModified = str(jsonData['lastModified'])
+
 		if buyerStatus == sellerStatus:
 			cursor.execute("SELECT quantity from Product WHERE productId =%s",(productId))
 			fRow = cursor.fetchone()
@@ -82,7 +81,7 @@ def updateOffer(jsonData):
 		commentData = cursor.fetchall()
 		commList = []
 		print "DB3*****"
-		cursor.execute("UPDATE Offer SET buyingQty=%s,offeredDetails=%s,buyerStatus=%s,sellerStatus=%s,offerExpiry=%s,productId=%s,buyerId=%s,lastModified=%s WHERE offerId=%s",(buyingQty,offeredDetails,buyerStatus,sellerStatus,offerExpiry,productId,buyerId,lastModified,offerId))
+		cursor.execute("UPDATE Offer SET buyingQty=%s,offeredDetails=%s,buyerStatus=%s,sellerStatus=%s,offerExpiry=%s,productId=%s,buyerId=%s,lastModified=%s WHERE offerId=%s",(buyingQty,offeredDetails,buyerStatus,sellerStatus,offerExpiry,productId,buyerId,str(time),offerId))
 		cursor.connection.commit()  
 		cursor.execute('SELECT * from Offer where offerId=%s', (offerId))
 		row = cursor.fetchone()
@@ -108,10 +107,10 @@ def updateOffer(jsonData):
 			cursor.close() 
 			return response 
 		      
-	except:
-			cursor.close()
-			errorResponse = cust_error(Constants.INTERNAL_SERVER_ERROR,"Offer could not be updated successfully due to some exception.")
-			return errorResponse
+	#except:
+	#		cursor.close()
+	#		errorResponse = cust_error(Constants.INTERNAL_SERVER_ERROR,"Offer could not be updated successfully due to some exception.")
+	#		return errorResponse
 	
 def getOfferById(offerId):
 	try:
