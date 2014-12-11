@@ -58,7 +58,7 @@ def createCategoryByName():
 	try:
 		postData = request.body.read()
 		jsonData = json.loads(postData)
-		categoryName = jsonData['categoryName']
+		categoryName = jsonData[Constants.CATEGORY_NAME]
 		print "Email Id is " +categoryName
 		if categoryName is None or categoryName=="":
 			errorResponse = cust_error(Constants.BAD_DATA,Constants.CATEGORY_NAME_VALIDATION)

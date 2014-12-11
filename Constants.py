@@ -38,3 +38,10 @@ class Constants:
 	JSON_INVALID='Product name expected in payload'
 	#QUANTITY_VALIDATION='Please specify the quantity'
 	#NEGATIVE_VALIDATION='Quanity cannot be less than zero'
+###############################Offer #################################
+	BUYINGQTY='buyingQty'	
+	OFFEREDDETAILS='offeredDetails'
+	BUYERSTATUS='buyerStatus'
+	SELLERSTATUS='sellerStatus'
+	OFFEREXPIRY='offerExpiry'
+	BUYERID='buyerId'
