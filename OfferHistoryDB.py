@@ -30,19 +30,19 @@ def getOfferHistoryByOfferId(offerId):
 			historyList = []
 			for data in historyData:
 				d = dict()
-				d['offerHistoryId'] = data[0]
-				d['modified'] = data[1]
-				d['lastDateTime'] = str(data[2])
-				d['offerId'] = data[3]
+				d[Constants.OFFERHISTORYID] = data[0]
+				d[Constants.MODIFIED] = data[1]
+				d[Constants.LASTDATETIME] = str(data[2])
+				d[Constants.OFFERID] = data[3]
 				historyList.append(d)
 
-			historyDict['OfferHistory'] = historyList	
+			historyDict[Constants.OFFERHISTORY] = historyList	
 			dbresponse = json.dumps(historyDict, indent = 4)
 
 		cursor.close()
 		return dbresponse
 	except:
-		errorResponse = cust_error(Constants.INTERNAL_SERVER_ERROR,"Something went wrong while processing at server side")
+		errorResponse = cust_error(Constants.INTERNAL_SERVER_ERROR,Constants.COMMENTHISTORY_EXP1)
 		cursor.close()
 		return errorResponse
 
@@ -73,9 +73,9 @@ def createCommentByOfferId(categoryId,productId,offerId,jsonData):
  			cursor.close()
  		else:
  			cursor.close()
- 			errorResponse = cust_error(404,"Comment could not be created successfully")
+ 			errorResponse = cust_error(Constants.NOT_FOUND,Constants.COMMENT_ERROR)
  			return errorResponse
 	except:
- 		errorResponse = cust_error(500,"Comment could not be created due to some exception")
+ 		errorResponse = cust_error(Constants.INTERNAL_SERVER_ERROR,Constants.COMMENT_EXCEPTION2)
  		cursor.close()
  		return errorResponse

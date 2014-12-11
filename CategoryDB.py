@@ -4,13 +4,13 @@ import DBConnectionPool
 from bottle import error,response
 
 def cust_error(statuscode,message):
-	error = dict();
-	error['status'] = statuscode
-	error['message'] = message
-	errorResponse = json.dumps(error, indent = 4)
-	response.status =statuscode
-	response.headers['Content-Type'] = 'application/json'
-	return errorResponse
+	error = dict()
+    error[Constants.STATUS] = statuscode
+    error[Constants.MESSAGE] = message
+    errorResponse = json.dumps(error, indent = 4)
+    response.status =statuscode
+    response.headers[Constants.CONTENT] = Constants.CONTENT_TYPE
+    return errorResponse
 
 def getAllCategories():
 	try:
@@ -18,22 +18,22 @@ def getAllCategories():
 		cursor.execute("Select * from Category")
 		row = cursor.fetchall()
 		if not row:
-			errorResponse = cust_error(404,"Catgory not found. Please create a new category.")
+			errorResponse = cust_error(Constants.NOT_FOUND,Constants.CATEGORY_ERROR1)
 			return errorResponse
 		else:
 			categoryDict = dict()
 			categoryList = []
 			for data in row:
 				d = dict()
-				d['categoryId'] = data[0]
-				d['categoryName'] = data[1]
+				d[Constants.CATEGORY_ID] = data[0]
+				d[Constants.CATEGORY_NAME] = data[1]
 				categoryList.append(d)
-			categoryDict['category'] = categoryList	
+			categoryDict[Constants.CATEGORY] = categoryList	
 			dbresponse = json.dumps(categoryDict, indent = 4)
 			cursor.close()
 			return dbresponse
 	except:
-		errorResponse = cust_error(500,"Category could not be found due to exception")
+		errorResponse = cust_error(Constants.INTERNAL_SERVER_ERROR,Constants.CATEGORY_ERROR2)
 		cursor.close()
 		return errorResponse
 
@@ -44,17 +44,17 @@ def getCategoryById(categoryId):
 		row = cursor.fetchone()
 		if row is not None:
 			d = dict()
-			d['categoryId'] = row[0]
-			d['categoryName'] = row[1]
+			d[Constants.CATEGORY_ID] = row[0]
+			d[Constants.CATEGORY_NAME] = row[1]
 			response = json.dumps(d, indent = 4)
 			cursor.close()
 			return response
 		else:
-			errorResponse = cust_error(404,"Category not found. Please check your categoryid again.")
+			errorResponse = cust_error(Constants.NOT_FOUND,Constants.CATEGORY_ERROR3)
 			cursor.close()
 			return errorResponse
 	except:
-		errorResponse = cust_error(500,"Something went wrong in processing at server side")
+		errorResponse = cust_error(Constants.INTERNAL_SERVER_ERROR,Constants.COMMENTHISTORY_EXP1)
 		cursor.close()
 		return errorResponse
 	
@@ -67,16 +67,16 @@ def createCategoryByName(categoryName):
 		row = cursor.fetchone()
 		if row is not None:
 			d = dict()
-			d['categoryId'] = row[0]
-			d['categoryName'] = row[1]
+			d[Constants.CATEGORY_ID] = row[0]
+			d[Constants.CATEGORY_NAME] = row[1]
 			response = json.dumps(d, indent = 4)
 			cursor.close()
 			return response
 		else:
-			errorResponse = cust_error(404,"Category not created properly.")
+			errorResponse = cust_error(Constants.NOT_FOUND,Constants.CATEGORY_ERROR4)
 			cursor.close()
 			return errorResponse
 	except:
-		errorResponse = cust_error(500,"Something went wrong in processing at server side")
+		errorResponse = cust_error(Constants.INTERNAL_SERVER_ERROR,Constants.COMMENTHISTORY_EXP1)
 		cursor.close()
 		return errorResponse

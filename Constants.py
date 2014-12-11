@@ -21,6 +21,13 @@ class Constants:
 	USER_EXCEPTION3='User not created successfully'
 	USER_EXCEPTION4='User not created successfully due to some exception'
 	EMAIL_VALIDATION='EmailID is required field'
+	COMMENTHISTORY_EXP1='Something went wrong while processing at server side'
+	COMMENT_ERROR='Comment could not be created successfully'
+	COMMENT_EXCEPTION2='Comment could not be created due to some exception'
+	CATEGORY_ERROR1='Catgory not found. Please create a new category.'
+	CATEGORY_ERROR2='Category could not be found due to exception'
+	CATEGORY_ERROR3='Category not found. Please check your categoryid again.'
+	CATEGORY_ERROR4='Category not created properly.'
 
 
 #################################Comment#############################
@@ -45,3 +52,18 @@ class Constants:
 	SELLERSTATUS='sellerStatus'
 	OFFEREXPIRY='offerExpiry'
 	BUYERID='buyerId'
+
+################################OfferHistory##############################
+
+	OFFERHISTORYID='offerHistoryId'
+	MODIFIED='modified'
+	LASTDATETIME='lastDateTime'
+	OFFERID='offerId'
+	OFFERHISTORY='OfferHistory'
+
+#################################Category###################################
+
+CATEGORY_ID='categoryId'
+CATEGORY_NAME='categoryName'
+CATEGORY='category'
+
