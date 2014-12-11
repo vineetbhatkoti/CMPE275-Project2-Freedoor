@@ -40,19 +40,29 @@ class Constants:
 ################################Category##############################
 	CATEGORY_NAME='categoryName'
 	CATEGORY_NAME_VALIDATION='Category name is required field'	
-
+	CATEGORY_ID='categoryId'
+	CATEGORY='category'
 ###############################Product################################
 	JSON_INVALID='Product name expected in payload'
 	#QUANTITY_VALIDATION='Please specify the quantity'
 	#NEGATIVE_VALIDATION='Quanity cannot be less than zero'
 ###############################Offer #################################
+	OFFERID = 'offerId'
 	BUYINGQTY='buyingQty'	
 	OFFEREDDETAILS='offeredDetails'
 	BUYERSTATUS='buyerStatus'
 	SELLERSTATUS='sellerStatus'
 	OFFEREXPIRY='offerExpiry'
 	BUYERID='buyerId'
-
+	PRODUCTID ='productId'
+	LASTMODIFIED = 'lastModified'
+	COMMENTS='comments'
+	LASTEVENT='lastEvent'
+	OFFERS ='offers'
+	DELETEOFFER_SUCCESS = 'Successfully deleted the Offer !!'
+	DELETEOFFER_FAIL = 'Offer could not be deleted due to some exception'
+	OFFER_NOT_FOUND = 'Offer not found. Please check your offerid.'
+	OFFER_FAIL_MESSAGE = 'Offer could not be retrieved successfully due to some exception.'
 ################################OfferHistory##############################
 
 	OFFERHISTORYID='offerHistoryId'
@@ -63,7 +73,5 @@ class Constants:
 
 #################################Category###################################
 
-CATEGORY_ID='categoryId'
-CATEGORY_NAME='categoryName'
-CATEGORY='category'
+
 

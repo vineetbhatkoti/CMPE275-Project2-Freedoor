@@ -5,12 +5,12 @@ from bottle import error,response
 
 def cust_error(statuscode,message):
 	error = dict()
-    error[Constants.STATUS] = statuscode
-    error[Constants.MESSAGE] = message
-    errorResponse = json.dumps(error, indent = 4)
-    response.status =statuscode
-    response.headers[Constants.CONTENT] = Constants.CONTENT_TYPE
-    return errorResponse
+	error[Constants.STATUS] = statuscode
+	error[Constants.MESSAGE] = message
+	errorResponse = json.dumps(error, indent = 4)
+	response.status =statuscode
+	response.headers[Constants.CONTENT] = Constants.CONTENT_TYPE
+	return errorResponse
 
 def getAllCategories():
 	try:

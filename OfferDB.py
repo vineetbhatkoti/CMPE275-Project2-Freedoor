@@ -30,11 +30,11 @@ def deleteOffer(offerId):
 		cursor.execute("DELETE FROM Offer WHERE offerId=%s",(offerId))
 		cursor.connection.commit()
 		cursor.close()
-		response=cust_success(Constants.SUCCESS,"Successfully deleted the Offer !!")
+		response=cust_success(Constants.SUCCESS,Constants.DELETEOFFER_SUCCESS)
 		return response
 	except:
 		cursor.close()
-		errorResponse = cust_error(Constants.INTERNAL_SERVER_ERROR,"Offer could not be deleted due to some exception.")
+		errorResponse = cust_error(Constants.INTERNAL_SERVER_ERROR,Constants.DELETEOFFER_FAIL)
 		return errorResponse
 	
 def updateOffer(productId,offerId,jsonData):
@@ -91,18 +91,18 @@ def updateOffer(productId,offerId,jsonData):
 			return errorResponse
 		else:
 			d = dict()
-			d['offerId'] = row[0]
-			d['buyingQty'] = row[1]
-			d['offeredDetails'] = str(row[2])
-			d['buyerStatus'] = row[3]
-			d['sellerStatus'] = row[4]
-			d['offerExpiry'] = str(row[5])
-			d['productId'] = row[6]
-			d['buyerId'] = row[7]
-			d['lastModified'] = str(row[8])
+			d[Constants.OFFERID] = row[0]
+			d[Constants.BUYINGQTY] = row[1]
+			d[Constants.OFFEREDDETAILS] = str(row[2])
+			d[Constants.BUYERSTATUS] = row[3]
+			d[Constants.SELLERSTATUS] = row[4]
+			d[Constants.OFFEREXPIRY] = str(row[5])
+			d[Constants.PRODUCTID] = row[6]
+			d[Constants.BUYERID] = row[7]
+			d[Constants.LASTMODIFIED] = str(row[8])
 			for commData in commentData:
 				commList.append(commData[1])
-			d['comments'] = commList
+			d[Constants.COMMENTS] = commList
 			response = json.dumps(d, indent = 4)
 			cursor.close() 
 			return response 
@@ -123,41 +123,41 @@ def getOfferById(offerId):
 		commList = []
 		if not row is None:
 			d = dict()
-			d['offerId'] = row[0]
-			d['buyingQty'] = row[1]
-			d['offeredDetails'] = row[2]
-			d['buyerStatus'] = row[3]
-			d['sellerStatus'] = row[4]
-			d['offerExpiry'] = str(row[5])
-			d['productId'] = row[6]
-			d['buyerId'] = row[7]
-			d['lastModified'] = str(row[8])
-			d['lastEvent'] = ""
+			d[Constants.OFFERID] = row[0]
+			d[Constants.BUYINGQTY] = row[1]
+			d[Constants.OFFEREDDETAILS] = row[2]
+			d[Constants.BUYERSTATUS] = row[3]
+			d[Constants.SELLERSTATUS] = row[4]
+			d[Constants.OFFEREXPIRY] = str(row[5])
+			d[Constants.PRODUCTID] = row[6]
+			d[Constants.BUYERID] = row[7]
+			d[Constants.LASTMODIFIED] = str(row[8])
+			d[Constants.LASTEVENT] = ""
 			for commData in commentData:
 				commList.append(commData[1])
-			d['comments'] = commList
+			d[Constants.COMMENTS] = commList
 			dbResponse = json.dumps(d, indent = 4)
 			cursor.close()
 			return dbResponse
 		else:
-			errorResponse = cust_error(Constants.NOT_FOUND,"Offer not found. Please check your offerid.")
+			errorResponse = cust_error(Constants.NOT_FOUND,Constants.OFFER_NOT_FOUND)
 			cursor.close()
 			return errorResponse
 	except:
 		cursor.close()
-		errorResponse = cust_error(Constants.INTERNAL_SERVER_ERROR,"Offer could not be retrieved successfully due to some exception.")
+		errorResponse = cust_error(Constants.INTERNAL_SERVER_ERROR,Constants.OFFER_FAIL_MESSAGE)
 		return errorResponse
 
 def createOfferByProductId(categoryId, productId,jsonData):
 	try:
 		cursor = DBConnectionPool.dbconnect()
-		buyingQty = jsonData['buyingQty']
-		offeredDetails = jsonData['offeredDetails']
-		buyerStatus = jsonData['buyerStatus']
-		sellerStatus = jsonData['sellerStatus']
-		offerExpiry = str(jsonData['offerExpiry'])
-		buyerId = jsonData['buyerId']
-		commentDesc = jsonData['comments']
+		buyingQty = jsonData[Constants.BUYINGQTY]
+		offeredDetails = jsonData[Constants.OFFEREDDETAILS]
+		buyerStatus = jsonData[Constants.BUYERSTATUS]
+		sellerStatus = jsonData[Constants.SELLERSTATUS]
+		offerExpiry = str(jsonData[Constants.OFFEREXPIRY])
+		buyerId = jsonData[Constants.BUYERID]
+		commentDesc = jsonData[Constants.COMMENTS]
 		now=datetime.now()
 		time = now.strftime('%Y-%m-%d %H:%M:%S')
 		
@@ -178,18 +178,18 @@ def createOfferByProductId(categoryId, productId,jsonData):
 			commList = []
 			if not data is None:
 				jdict = dict()
-				jdict['offerId'] = data[0]
-				jdict['buyingQty'] = data[1]
-				jdict['offeredDetails'] = data[2]
-				jdict['buyerStatus'] = data[3]
-				jdict['sellerStatus'] = data[4]
-				jdict['offerExpiry'] = str(data[5])
-				jdict['productId'] = data[6]
-				jdict['buyerId'] = data[7]
-				jdict['lastModified'] = str(data[8])
+				jdict[Constants.OFFERID] = data[0]
+				jdict[Constants.BUYINGQTY] = data[1]
+				jdict[Constants.OFFEREDDETAILS] = data[2]
+				jdict[Constants.BUYERSTATUS] = data[3]
+				jdict[Constants.SELLERSTATUS] = data[4]
+				jdict[Constants.OFFEREXPIRY] = str(data[5])
+				jdict[Constants.PRODUCTID] = data[6]
+				jdict[Constants.BUYERID] = data[7]
+				jdict[Constants.LASTMODIFIED] = str(data[8])
 				for commData in commentData:
 					commList.append(commData[1])
-				jdict['comments'] = commList
+				jdict[Constants.COMMENTS] = commList
 				dbResponse=json.dumps(jdict,indent = 4)
 				return dbResponse
 			else:			
@@ -218,17 +218,17 @@ def getAllOffersByProductId(categoryId, productId):
 			offerList = []
 			for data in offerData:
 				jdict = dict()
-				jdict['offerId'] = data[0]
-				jdict['buyingQty'] = data[1]
-				jdict['offeredDetails'] = data[2]
-				jdict['buyerStatus'] = data[3]
-				jdict['sellerStatus'] = data[4]
-				jdict['offerExpiry'] = str(data[5])
-				jdict['productId'] = data[6]
-				jdict['buyerId'] = data[7]
-				jdict['lastModified'] = str(data[8])
+				jdict[Constants.OFFERID] = data[0]
+				jdict[Constants.BUYINGQTY] = data[1]
+				jdict[Constants.OFFEREDDETAILS] = data[2]
+				jdict[Constants.BUYERSTATUS] = data[3]
+				jdict[Constants.SELLERSTATUS] = data[4]
+				jdict[Constants.OFFEREXPIRY] = str(data[5])
+				jdict[Constants.PRODUCTID] = data[6]
+				jdict[Constants.BUYERID] = data[7]
+				jdict[Constants.LASTMODIFIED] = str(data[8])
 				offerList.append(jdict)		
-			offerDict['offers'] = offerList		
+			offerDict[Constants.OFFERS] = offerList		
 			dbResponse=json.dumps(offerDict,indent = 4)
 			return dbResponse						
 	except:
